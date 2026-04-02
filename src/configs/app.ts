@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import user from "../routes/user.routes";
 export class App {
   public app = express();
 
@@ -18,5 +19,7 @@ export class App {
     this.app.use(express.json());
   }
 
-  private initializeRoutes() {}
+  private initializeRoutes() {
+    this.app.use("/api/users", user);
+  }
 }
