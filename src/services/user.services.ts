@@ -1,4 +1,5 @@
 import User from "../database/models/user.models";
+import bcrypt from "bcrypt";
 
 export const registerUserService = async (
   name: string,
@@ -14,10 +15,14 @@ export const registerUserService = async (
   if (emailExist) {
     throw new Error("EMAIL_EXIST!");
   }
+  const hashPassword = await bcrypt.hash(
+    password,
+    Number(process.env.BCRYPT_SALT_ROUNDS),
+  );
   const user = await User.create({
     name,
     email,
-    password,
+    password: hashPassword,
     phone,
     profileImage,
   });
