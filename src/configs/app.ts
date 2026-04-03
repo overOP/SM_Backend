@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import user from "../routes/user.routes";
+import user from "../routes/student.routes";
 export class App {
   public app = express();
 

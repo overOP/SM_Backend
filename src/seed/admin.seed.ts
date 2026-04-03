@@ -32,7 +32,7 @@ const adminSeed = async () => {
       name: SUPER_ADMIN_NAME,
       password: hashPassword,
       email: SUPER_ADMIN_EMAIL,
-      phone: SUPER_ADMIN_PHONE,
+      phoneNumber: SUPER_ADMIN_PHONE,
       role: SUPER_ADMIN_ROLE,
     });
     console.log("SuperAdmin created sucessfully");

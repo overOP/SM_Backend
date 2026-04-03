@@ -38,16 +38,47 @@ class User extends Model {
   declare password: string;
 
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.STRING,
     allowNull: true,
   })
-  declare phone: number;
+  declare phoneNumber: string;
 
   @Column({
-    type: DataType.ENUM("user", "admin", "superadmin"),
-    defaultValue: "user",
+    type: DataType.STRING,
+    allowNull: true,
   })
-  declare role: "user" | "admin" | "superadmin";
+  declare guardianName: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  declare subject: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  declare classAssigned: string;
+
+  @Column({
+    type: DataType.ENUM("active", "onLeave", "inActive"),
+    defaultValue: "active",
+  })
+  declare status: "active" | "onLeave" | "inActive";
+
+  @Column({
+    type: DataType.ENUM(
+      "student",
+      "teacher",
+      "principal",
+      "parent",
+      "superAdmin",
+    ),
+
+    defaultValue: "student",
+  })
+  declare role: "student" | "teacher" | "principal" | "parent" | "superadmin";
 }
 
 export default User;
