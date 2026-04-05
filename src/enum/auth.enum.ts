@@ -17,3 +17,18 @@ export enum Status {
   OnLeave = "onLeave",
   InActive = "inActive",
 }
+
+export enum FeeStatus {
+  Paid = "paid",
+  Due = "due",
+}
+
+export enum AttendanceStatus {
+  Present = "present",
+  Absent = "absent",
+}
+
+export enum ResultStatus {
+  Pass = "pass",
+  NG = "NG",
+}
