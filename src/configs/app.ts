@@ -1,5 +1,10 @@
 import express from "express";
 import cors from "cors";
+import userRouter from "../routes/user.route";
+import studentRouter from "../routes/student.route";
+import teacherRouter from "../routes/teacher.route";
+import parentRouter from "../routes/parent.route";
+
 export class App {
   public app = express();
 
@@ -18,5 +23,10 @@ export class App {
     this.app.use(express.json());
   }
 
-  private initializeRoutes() {}
+  private initializeRoutes() {
+    this.app.use("/api/users", userRouter);
+    this.app.use("/api/students", studentRouter);
+    this.app.use("/api/teachers", teacherRouter);
+    this.app.use("/api/parents", parentRouter);
+  }
 }

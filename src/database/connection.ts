@@ -8,7 +8,7 @@ const sequelize = new Sequelize({
   host: process.env.DB_HOST!,
   port: Number(process.env.DB_PORT!),
   logging: false,
-  models: [__dirname + "/models"],
+  models: [__dirname + "/../models"],
 });
 
 export const connectToDatabase = async (): Promise<void> => {
