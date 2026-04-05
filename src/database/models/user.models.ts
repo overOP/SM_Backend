@@ -53,7 +53,19 @@ class User extends Model {
     type: DataType.STRING,
     allowNull: true,
   })
+  declare guardianContact: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
   declare subject: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  declare classGrade: string;
 
   @Column({
     type: DataType.STRING,

@@ -62,3 +62,56 @@ export const getAllUserService = async () => {
   const user = await User.findAll();
   return user;
 };
+
+export const getUserByIdService = async (id: string) => {
+  const user = await User.findByPk(id);
+  return user;
+};
+
+export const updateUserByIdService = async (id: string, data: any) => {
+  const user = await User.findByPk(id);
+
+  if (!user) {
+    throw new Error("USER_NOT_FOUND");
+  }
+
+  user.set(data);
+  user.save();
+
+  return user;
+};
+
+export const updatePasswordService = async (
+  id: string,
+  password: string,
+  newPassword: string,
+) => {
+  const user = await User.findByPk(id);
+  console.log(user);
+
+  if (!user) {
+    throw new Error("USER_NOT_FOUND");
+  }
+  const checkPassword = await bcrypt.compare(password, user.password);
+  console.log(checkPassword);
+  if (!checkPassword) {
+    throw new Error("OLD_PASSWORD_DIDNOT_MATCH");
+  }
+  const hashPassword = await bcrypt.hash(
+    newPassword,
+    Number(process.env.BCRYPT_SALT_ROUNDS),
+  );
+  console.log(hashPassword);
+
+  user.password = hashPassword;
+  await user.save();
+
+  return user;
+};
+
+export const deleteUserService = async (id: string) => {
+  const user = await User.findByPk(id);
+
+  await user?.destroy();
+  return user;
+};
