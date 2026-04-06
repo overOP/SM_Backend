@@ -1,6 +1,8 @@
 import User from "../database/models/user.models";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { Op } from "sequelize";
+import { Role } from "../enum/auth.enum";
 
 export const registerUserService = async (
   name: string,
@@ -59,7 +61,13 @@ export const loginService = async (email: string, password: string) => {
 };
 
 export const getAllUserService = async () => {
-  const user = await User.findAll();
+  const user = await User.findAll({
+    where: {
+      role: {
+        [Op.ne]: Role.Superadmin,
+      },
+    },
+  });
   return user;
 };
 

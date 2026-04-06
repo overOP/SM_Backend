@@ -43,6 +43,7 @@ class User extends Model {
   })
   declare phoneNumber: string;
 
+  // student
   @Column({
     type: DataType.STRING,
     allowNull: true,
@@ -53,8 +54,32 @@ class User extends Model {
     type: DataType.STRING,
     allowNull: true,
   })
-  declare guardianContact: string;
+  declare class: string;
 
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  declare rollNumber: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  declare section: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  declare amount: string;
+
+  // teacher
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  declare classAssigned: string;
   @Column({
     type: DataType.STRING,
     allowNull: true,
@@ -62,23 +87,12 @@ class User extends Model {
   declare subject: string;
 
   @Column({
-    type: DataType.STRING,
-    allowNull: true,
-  })
-  declare classGrade: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: true,
-  })
-  declare classAssigned: string;
-
-  @Column({
     type: DataType.ENUM("active", "onLeave", "inActive"),
     defaultValue: "active",
   })
   declare status: "active" | "onLeave" | "inActive";
 
+  // user
   @Column({
     type: DataType.ENUM(
       "student",

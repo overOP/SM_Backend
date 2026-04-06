@@ -7,11 +7,13 @@ import {
   registerUserService,
   updatePasswordService,
   updateUserByIdService,
-} from "../services/student.service";
+} from "../services/user.service";
 import {
   sendErrorResponse,
   sendSuccessResponse,
 } from "../utils/responseHelper";
+import { Op, where } from "sequelize";
+import { Role } from "../enum/auth.enum";
 
 class AuthController {
   static async registerUser(req: Request, res: Response) {
@@ -51,6 +53,14 @@ class AuthController {
     }
   }
 
+  static async getAllUser(req: Request, res: Response) {
+    try {
+      const user = await getAllUserService();
+      sendSuccessResponse(res, "Data fetched", user, 200);
+    } catch (err: any) {
+      sendErrorResponse(res, "Error occured", 400);
+    }
+  }
   static async getUserById(req: Request, res: Response) {
     try {
       let id: any;
@@ -91,15 +101,6 @@ class AuthController {
         return sendErrorResponse(res, "Passowrd Didnot Match", 400);
       }
       return sendErrorResponse(res, "Error occured", 400);
-    }
-  }
-
-  static async getAllUser(req: Request, res: Response) {
-    try {
-      const user = await getAllUserService();
-      sendSuccessResponse(res, "Data fetched", user, 200);
-    } catch (err: any) {
-      sendErrorResponse(res, "Error occured", 400);
     }
   }
 

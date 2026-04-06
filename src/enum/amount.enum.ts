@@ -3,7 +3,7 @@ export enum Amount {
   "Due" = "due",
 }
 
-export enum Category {
-  "Paid" = "paid",
-  "Due" = "due",
-}
+// export enum Category {
+//   "Paid" = "paid",
+//   "Due" = "due",
+// }

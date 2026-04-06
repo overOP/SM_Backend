@@ -1,0 +1,88 @@
+import { Request, Response } from "express";
+import {
+  addFeeServices,
+  deleteFeeServices,
+  getAllFeeServices,
+  getFeeByIdServices,
+  updateFeeByIdServices,
+} from "../services/fee.service";
+import {
+  sendErrorResponse,
+  sendSuccessResponse,
+} from "../utils/responseHelper";
+
+class FeeController {
+  static async addFee(req: Request, res: Response) {
+    try {
+      const {
+        feeTitle,
+        category,
+        description,
+        feeDate,
+        feeTime,
+        location,
+        targetAudience,
+      } = req.body;
+
+      const fees = await addFeeServices(
+        feeTitle,
+        category,
+        description,
+        feeDate,
+        feeTime,
+        location,
+        targetAudience,
+      );
+      return sendSuccessResponse(res, "Fee added successfully", fees, 201);
+    } catch (err: any) {
+      return sendErrorResponse(res, "Error adding fee", 400);
+    }
+  }
+
+  static async getAllFee(req: Request, res: Response) {
+    try {
+      const fees = await getAllFeeServices();
+      return sendSuccessResponse(res, "Fee fetched successfully", fees, 200);
+    } catch (err: any) {
+      return sendErrorResponse(res, "Error fetching fee", 400);
+    }
+  }
+
+  static async getFeeById(req: Request, res: Response) {
+    try {
+      let id = req.params;
+      const fees = await getFeeByIdServices(id as any);
+      return sendSuccessResponse(res, "Fee fetched successfully", fees, 200);
+    } catch (err: any) {
+      return sendErrorResponse(res, "Error fetching fee", 400);
+    }
+  }
+
+  static async updateFeeById(req: Request, res: Response) {
+    try {
+      let id = req.params;
+      let data = req.body;
+      const fees = await updateFeeByIdServices(id as any, data);
+      return sendSuccessResponse(res, "Fee updated successfully", fees, 201);
+    } catch (err: any) {
+      if (err.message === "FEE_NOT_FOUND") {
+        return sendErrorResponse(res, "Fee not found", 400);
+      }
+      return sendErrorResponse(res, "Error updating fee", 400);
+    }
+  }
+  static async deleteFee(req: Request, res: Response) {
+    try {
+      let id = req.params;
+      const fees = await deleteFeeServices(id as any);
+      return sendSuccessResponse(res, "Fee deleted successfully", fees, 201);
+    } catch (err: any) {
+      if (err.message === "FEE_NOT_FOUND") {
+        return sendErrorResponse(res, "Fee not found", 400);
+      }
+      return sendErrorResponse(res, "Error deleting fee", 400);
+    }
+  }
+}
+
+export default FeeController;

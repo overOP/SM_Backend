@@ -1,4 +1,12 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table,
+} from "sequelize-typescript";
+import User from "./user.models";
 
 @Table({
   tableName: "results",
@@ -13,11 +21,11 @@ class Result extends Model {
   })
   declare id: string;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: true,
-  })
-  declare class: string | null;
+  // @Column({
+  //   type: DataType.STRING,
+  //   allowNull: true,
+  // })
+  // declare class: string | null;
 
   @Column({
     type: DataType.STRING,
@@ -42,6 +50,16 @@ class Result extends Model {
     defaultValue: "NG",
   })
   declare status: "pass" | "NG";
+
+  @ForeignKey(() => User)
+  @Column({
+    type: DataType.UUID,
+    allowNull: false,
+  })
+  declare studentId: string;
+
+  @BelongsTo(() => User)
+  declare user: User;
 }
 
 export default Result;

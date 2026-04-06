@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
-import user from "../routes/student.routes";
+import user from "../routes/user.routes";
+import event from "../routes/event.routes";
+import result from "../routes/result.routes";
 export class App {
   public app = express();
 
@@ -21,5 +23,7 @@ export class App {
 
   private initializeRoutes() {
     this.app.use("/api/users", user);
+    this.app.use("/api/events", event);
+    this.app.use("/api/results", result);
   }
 }

@@ -51,7 +51,6 @@ class Event extends Model {
 
   @Column({
     type: DataType.STRING,
-    defaultValue: "Due",
   })
   declare targetAudience: string;
 }
