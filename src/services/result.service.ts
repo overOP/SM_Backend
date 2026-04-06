@@ -1,5 +1,6 @@
 import Result from "../database/models/result.models";
 import User from "../database/models/user.models";
+import { ResultStatus } from "../enum/auth.enum";
 
 export const addResultServices = async (
   subject: string,
@@ -12,7 +13,7 @@ export const addResultServices = async (
     subject,
     marks,
     grade,
-    status,
+    ResultStatus,
     userId,
   });
 
@@ -36,7 +37,14 @@ export const getResultByIdServices = async (id: string) => {
 };
 
 export const updateResultByIdServices = async (id: string, data: any) => {
-  const results = await Result.findByPk(id);
+  const results = await Result.findByPk(id, {
+    include: [
+      {
+        model: User,
+        attributes: ["id", "name", "rollNumber", "class"],
+      },
+    ],
+  });
   if (!results) {
     throw new Error("RESULT_NOT_FOUND");
   }

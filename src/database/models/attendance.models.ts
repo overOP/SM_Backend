@@ -1,4 +1,12 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table,
+} from "sequelize-typescript";
+import User from "./user.models";
 
 @Table({
   tableName: "attendances",
@@ -14,16 +22,20 @@ class Attendance extends Model {
   declare id: string;
 
   @Column({
-    type: DataType.STRING,
-    allowNull: true,
-  })
-  declare rollNo: string;
-
-  @Column({
     type: DataType.ENUM("present", "absent"),
     defaultValue: "present",
   })
   declare status: "present" | "absent";
+
+  @ForeignKey(() => User)
+  @Column({
+    type: DataType.UUID,
+    allowNull: true,
+  })
+  declare studentId: string;
+
+  @BelongsTo(() => User)
+  declare user: User;
 }
 
 export default Attendance;

@@ -12,8 +12,6 @@ import {
   sendErrorResponse,
   sendSuccessResponse,
 } from "../utils/responseHelper";
-import { Op, where } from "sequelize";
-import { Role } from "../enum/auth.enum";
 
 class AuthController {
   static async registerUser(req: Request, res: Response) {

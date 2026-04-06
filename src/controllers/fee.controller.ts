@@ -14,25 +14,9 @@ import {
 class FeeController {
   static async addFee(req: Request, res: Response) {
     try {
-      const {
-        feeTitle,
-        category,
-        description,
-        feeDate,
-        feeTime,
-        location,
-        targetAudience,
-      } = req.body;
+      const { studentId } = req.body;
 
-      const fees = await addFeeServices(
-        feeTitle,
-        category,
-        description,
-        feeDate,
-        feeTime,
-        location,
-        targetAudience,
-      );
+      const fees = await addFeeServices(studentId);
       return sendSuccessResponse(res, "Fee added successfully", fees, 201);
     } catch (err: any) {
       return sendErrorResponse(res, "Error adding fee", 400);
@@ -50,7 +34,7 @@ class FeeController {
 
   static async getFeeById(req: Request, res: Response) {
     try {
-      let id = req.params;
+      let id = req.params.id;
       const fees = await getFeeByIdServices(id as any);
       return sendSuccessResponse(res, "Fee fetched successfully", fees, 200);
     } catch (err: any) {
@@ -60,7 +44,7 @@ class FeeController {
 
   static async updateFeeById(req: Request, res: Response) {
     try {
-      let id = req.params;
+      let id = req.params.id;
       let data = req.body;
       const fees = await updateFeeByIdServices(id as any, data);
       return sendSuccessResponse(res, "Fee updated successfully", fees, 201);
@@ -73,7 +57,7 @@ class FeeController {
   }
   static async deleteFee(req: Request, res: Response) {
     try {
-      let id = req.params;
+      let id = req.params.id;
       const fees = await deleteFeeServices(id as any);
       return sendSuccessResponse(res, "Fee deleted successfully", fees, 201);
     } catch (err: any) {

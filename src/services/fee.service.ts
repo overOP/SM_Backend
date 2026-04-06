@@ -1,27 +1,32 @@
 import Fee from "../database/models/fee.models";
+import User from "../database/models/user.models";
+import { FeeStatus } from "../enum/auth.enum";
 
-export const addFeeServices = async (
-  feeTitle: string,
-  category: string,
-  description: string,
-  feeDate: string,
-  feeTime: string,
-  location: string,
-  targetAudience: string,
-) => {
+export const addFeeServices = async (studentId: string) => {
   const fees = await Fee.create({
-    // totalAmount,
+    studentId,
+    FeeStatus,
   });
   return fees;
 };
 
 export const getAllFeeServices = async () => {
-  const fees = await Fee.findAll();
+  const fees = await Fee.findAll({
+    include: {
+      model: User,
+      attributes: ["name", "amount"],
+    },
+  });
   return fees;
 };
 
 export const getFeeByIdServices = async (id: string) => {
-  const fees = await Fee.findByPk(id);
+  const fees = await Fee.findByPk(id, {
+    include: {
+      model: User,
+      attributes: ["name", "amount"],
+    },
+  });
   return fees;
 };
 
