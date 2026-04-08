@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import {
-  addFeeServices,
   deleteFeeServices,
   getAllFeeServices,
   getFeeByIdServices,
@@ -12,17 +11,6 @@ import {
 } from "../utils/responseHelper";
 
 class FeeController {
-  static async addFee(req: Request, res: Response) {
-    try {
-      const { studentId } = req.body;
-
-      const fees = await addFeeServices(studentId);
-      return sendSuccessResponse(res, "Fee added successfully", fees, 201);
-    } catch (err: any) {
-      return sendErrorResponse(res, "Error adding fee", 400);
-    }
-  }
-
   static async getAllFee(req: Request, res: Response) {
     try {
       const fees = await getAllFeeServices();
@@ -45,8 +33,8 @@ class FeeController {
   static async updateFeeById(req: Request, res: Response) {
     try {
       let id = req.params.id;
-      let data = req.body;
-      const fees = await updateFeeByIdServices(id as any, data);
+      let { paidAmount } = req.body;
+      const fees = await updateFeeByIdServices(id as any, paidAmount);
       return sendSuccessResponse(res, "Fee updated successfully", fees, 201);
     } catch (err: any) {
       if (err.message === "FEE_NOT_FOUND") {

@@ -21,17 +21,29 @@ class Fee extends Model {
   })
   declare id: string;
 
-  // @Column({
-  //   type: DataType.STRING,
-  //   allowNull: true,
-  // })
-  // declare totalAmount: string;
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: true,
+  })
+  declare totalAmount: number;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: true,
+  })
+  declare paidAmount: number;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: true,
+  })
+  declare dueAmount: number;
 
   @Column({
     type: DataType.ENUM("Paid", "Due"),
     defaultValue: "Due",
   })
-  declare status: "Paid" | "Due";
+  declare AmountStatus: "Paid" | "Due";
 
   @ForeignKey(() => User)
   @Column({

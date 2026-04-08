@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Op } from "sequelize";
 import { Role } from "../enum/auth.enum";
+import Fee from "../database/models/fee.models";
 
 export const registerUserService = async (
   name: string,
@@ -32,6 +33,64 @@ export const registerUserService = async (
     Role,
   });
   return user;
+};
+export const registerStudentService = async (
+  profileImage: string,
+  name: string,
+  email: string,
+  password: string,
+  phoneNumber: number,
+  guardianName: string,
+  classGrade: string,
+  rollNumber: string,
+  section: string,
+  totalAmount: number,
+  paidAmount: number,
+  role: "student",
+) => {
+  console.log("Checking email");
+  const emailExist = await User.findOne({
+    where: { email: email },
+  });
+
+  if (emailExist) {
+    throw new Error("EMAIL_EXIST!");
+  }
+  console.log("Hashing password");
+
+  const hashPassword = await bcrypt.hash(
+    password,
+    Number(process.env.BCRYPT_SALT_ROUNDS),
+  );
+  console.log("Creating student");
+
+  const student = await User.create({
+    profileImage,
+    name,
+    email,
+    password: hashPassword,
+    phoneNumber,
+    guardianName,
+    classGrade,
+    rollNumber,
+    section,
+    totalAmount,
+    paidAmount,
+    role,
+  });
+
+  const paidAtRegistration = paidAmount || 0;
+  const dueAmount = totalAmount - paidAtRegistration;
+  console.log("Creating fee");
+
+  await Fee.create({
+    studentId: student.id,
+    totalAmount,
+    paidAmount: paidAtRegistration,
+    dueAmount,
+  });
+  console.log("Done");
+  return student;
 };
 
 export const loginService = async (email: string, password: string) => {
@@ -133,11 +192,11 @@ export const getAllStudentService = async () => {
       "profileImage",
       "name",
       "email",
+      "phoneNumber",
       "guardianName",
-      "class",
+      "classGrade",
       "rollNumber",
       "section",
-      "amount",
       "role",
     ],
     where: {

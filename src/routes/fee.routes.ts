@@ -4,7 +4,6 @@ import catchAsync from "../utils/catchAsync";
 
 const router: Router = express.Router();
 
-router.post("/add-fee", catchAsync(FeeController.addFee));
 router.get("/", catchAsync(FeeController.getAllFee));
 
 router.get("/:id", catchAsync(FeeController.getFeeById));

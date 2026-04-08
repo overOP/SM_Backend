@@ -54,7 +54,7 @@ class User extends Model {
     type: DataType.STRING,
     allowNull: true,
   })
-  declare class: string;
+  declare classGrade: string;
 
   @Column({
     type: DataType.STRING,
@@ -67,12 +67,6 @@ class User extends Model {
     allowNull: true,
   })
   declare section: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: true,
-  })
-  declare amount: string;
 
   // teacher
   @Column({

@@ -7,6 +7,7 @@ import {
   getAllUserService,
   getUserByIdService,
   loginService,
+  registerStudentService,
   registerUserService,
   totalCountSevice,
   updatePasswordService,
@@ -16,8 +17,6 @@ import {
   sendErrorResponse,
   sendSuccessResponse,
 } from "../utils/responseHelper";
-import { Role } from "../enum/auth.enum";
-import { error } from "console";
 
 class AuthController {
   static async registerUser(req: Request, res: Response) {
@@ -40,57 +39,104 @@ class AuthController {
       );
     } catch (err: any) {
       if (err.message === "EMAIL_EXIST!") {
-        sendErrorResponse(res, "User exist with this email", 400);
+        return sendErrorResponse(res, "User exist with this email", 400);
       }
     }
   }
 
+  static async registerStudent(req: Request, res: Response) {
+    try {
+      const {
+        profileImage,
+        name,
+        email,
+        password,
+        phoneNumber,
+        guardianName,
+        classGrade,
+        rollNumber,
+        section,
+        totalAmount,
+        paidAmount,
+        role,
+      } = req.body;
+
+      const result = await registerStudentService(
+        profileImage,
+        name,
+        email,
+        password,
+        phoneNumber,
+        guardianName,
+        classGrade,
+        rollNumber,
+        section,
+        totalAmount,
+        paidAmount,
+        role,
+      );
+
+      return sendSuccessResponse(
+        res,
+        "User registration was sucessfull",
+        result,
+        200,
+      );
+    } catch (err: any) {
+      console.log(err.message);
+      if (err.message === "EMAIL_EXIST!") {
+        return sendErrorResponse(res, "User exist with this email", 400);
+      }
+      return sendErrorResponse(res, "Internal server error", 500);
+    }
+  }
   static async loginUser(req: Request, res: Response) {
     try {
       const { email, password } = req.body;
       const user = await loginService(email, password);
-      sendSuccessResponse(res, "Login Sucessfull", user, 200);
+      return sendSuccessResponse(res, "Login Sucessfull", user, 200);
     } catch (err: any) {
       if (err.message === "USER_NOT_FOUND" || "INVALID_CREDENTIALS") {
-        sendErrorResponse(res, "Invalid credentials", 400);
+        return sendErrorResponse(res, "Invalid credentials", 400);
       }
-      sendErrorResponse(res, "Error occured while logging In", 400);
+      return sendErrorResponse(res, "Error occured while logging In", 400);
     }
   }
 
   static async getAllUser(req: Request, res: Response) {
     try {
-      const user = await getAllUserService();
-      sendSuccessResponse(res, "Data fetched", user, 200);
+      const users = await getAllUserService();
+      return sendSuccessResponse(res, "Data fetched", users, 200);
     } catch (err: any) {
-      sendErrorResponse(res, "Error occured", 400);
+      return sendErrorResponse(res, "Error occured", 400);
     }
   }
 
   static async getAllStudent(req: Request, res: Response) {
     try {
-      const user = await getAllStudentService();
-      sendSuccessResponse(res, "Data fetched", user, 200);
+      const students = await getAllStudentService();
+      return sendSuccessResponse(res, "Data fetched", students, 200);
     } catch (err: any) {
-      sendErrorResponse(res, "Error occured", 400);
+      console.log(err.message);
+      return sendErrorResponse(res, "Error occured", 400);
     }
   }
 
   static async getAllTeacher(req: Request, res: Response) {
     try {
-      const user = await getAllTeacherService();
-      sendSuccessResponse(res, "Data fetched", user, 200);
+      const teachers = await getAllTeacherService();
+      return sendSuccessResponse(res, "Data fetched", teachers, 200);
     } catch (err: any) {
-      sendErrorResponse(res, "Error occured", 400);
+      return sendErrorResponse(res, "Error occured", 400);
     }
   }
 
   static async getAllParents(req: Request, res: Response) {
     try {
-      const user = await getAllParentService();
-      sendSuccessResponse(res, "Data fetched", user, 200);
+      const parents = await getAllParentService();
+      return sendSuccessResponse(res, "Data fetched", parents, 200);
     } catch (err: any) {
-      sendErrorResponse(res, "Error occured", 400);
+      return sendErrorResponse(res, "Error occured", 400);
     }
   }
 
@@ -99,9 +145,9 @@ class AuthController {
       let id: any;
       id = req.params.id;
       const user = await getUserByIdService(id);
-      sendSuccessResponse(res, "Data fetched", user, 200);
+      return sendSuccessResponse(res, "Data fetched", user, 200);
     } catch (err: any) {
-      sendErrorResponse(res, "Error occured", 400);
+      return sendErrorResponse(res, "Error occured", 400);
     }
   }
 
@@ -111,12 +157,12 @@ class AuthController {
       id = req.params.id;
       const user = await updateUserByIdService(id, req.body);
 
-      sendSuccessResponse(res, "Data fetched", user, 200);
+      return sendSuccessResponse(res, "Data fetched", user, 200);
     } catch (err: any) {
       if (err.message === "USER_NOT_FOUND") {
-        sendErrorResponse(res, "User Not Found", 400);
+        return sendErrorResponse(res, "User Not Found", 400);
       }
-      sendErrorResponse(res, "Error occured", 400);
+      return sendErrorResponse(res, "Error occured", 400);
     }
   }
 
@@ -142,20 +188,20 @@ class AuthController {
       let id: any;
       id = req.params.id;
       const data = await deleteUserService(id);
-      sendSuccessResponse(res, "Data Deleted", data, 200);
+      return sendSuccessResponse(res, "Data Deleted", data, 200);
     } catch (err: any) {
-      sendErrorResponse(res, "Error occured", 400);
+      return sendErrorResponse(res, "Error occured", 400);
     }
   }
 
   static async totalCount(req: Request, res: Response) {
     try {
       const data = await totalCountSevice();
-      sendSuccessResponse(res, "Total user", data, 200);
+      return sendSuccessResponse(res, "Total user", data, 200);
     } catch (err: any) {
       console.log(err.message);
 
-      sendErrorResponse(res, "Error occured", 400);
+      return sendErrorResponse(res, "Error occured", 400);
     }
   }
 }

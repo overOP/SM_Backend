@@ -1,4 +1,4 @@
-export enum Amount {
+export enum AmountStatus {
   "Paid" = "paid",
   "Due" = "due",
 }

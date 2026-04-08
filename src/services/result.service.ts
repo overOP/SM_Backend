@@ -6,7 +6,7 @@ export const addResultServices = async (
   subject: string,
   marks: string,
   grade: string,
-  status: "pass" | "NG",
+  ResultStatus: "pass" | "NG",
   userId: string,
 ) => {
   const results = await Result.create({
