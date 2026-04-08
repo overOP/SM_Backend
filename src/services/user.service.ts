@@ -10,6 +10,7 @@ export const registerUserService = async (
   password: string,
   phone: number,
   profileImage: string,
+  Role: "student" | "teacher" | "parent",
 ) => {
   const emailExist = await User.findOne({
     where: { email: email },
@@ -28,6 +29,7 @@ export const registerUserService = async (
     password: hashPassword,
     phone,
     profileImage,
+    Role,
   });
   return user;
 };
@@ -58,22 +60,6 @@ export const loginService = async (email: string, password: string) => {
       profileImage: userExist.profileImage,
     },
   };
-};
-
-export const getAllUserService = async () => {
-  const user = await User.findAll({
-    where: {
-      role: {
-        [Op.ne]: Role.Superadmin,
-      },
-    },
-  });
-  return user;
-};
-
-export const getUserByIdService = async (id: string) => {
-  const user = await User.findByPk(id);
-  return user;
 };
 
 export const updateUserByIdService = async (id: string, data: any) => {
@@ -122,4 +108,97 @@ export const deleteUserService = async (id: string) => {
 
   await user?.destroy();
   return user;
+};
+
+export const getAllUserService = async () => {
+  const user = await User.findAll({
+    where: {
+      role: {
+        [Op.ne]: Role.Superadmin,
+      },
+    },
+  });
+  return user;
+};
+
+export const getUserByIdService = async (id: string) => {
+  const user = await User.findByPk(id);
+  return user;
+};
+
+export const getAllStudentService = async () => {
+  const user = await User.findAll({
+    attributes: [
+      "id",
+      "profileImage",
+      "name",
+      "email",
+      "guardianName",
+      "class",
+      "rollNumber",
+      "section",
+      "amount",
+      "role",
+    ],
+    where: {
+      role: {
+        [Op.eq]: Role.Student,
+      },
+    },
+  });
+  return user;
+};
+
+export const getAllTeacherService = async () => {
+  const user = await User.findAll({
+    attributes: [
+      "id",
+      "profileImage",
+      "name",
+      "email",
+      "classAssigned",
+      "subject",
+      "phoneNumber",
+    ],
+    where: {
+      role: {
+        [Op.eq]: Role.Teacher,
+      },
+    },
+  });
+  return user;
+};
+
+export const getAllParentService = async () => {
+  const user = await User.findAll({
+    attributes: ["id", "name", "email", "profileImage", "phoneNumber", "role"],
+    where: {
+      role: {
+        [Op.eq]: Role.Parent,
+      },
+    },
+  });
+  return user;
+};
+
+export const totalCountSevice = async () => {
+  const totalUser = await User.count();
+  const totalStudent = await User.count({
+    where: {
+      role: Role.Student,
+    },
+  });
+
+  const totalTeacher = await User.count({
+    where: {
+      role: Role.Teacher,
+    },
+  });
+
+  const totalParent = await User.count({
+    where: {
+      role: Role.Parent,
+    },
+  });
+  return { totalUser, totalStudent, totalTeacher, totalParent };
 };

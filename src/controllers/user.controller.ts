@@ -1,10 +1,14 @@
 import { Request, Response } from "express";
 import {
   deleteUserService,
+  getAllParentService,
+  getAllStudentService,
+  getAllTeacherService,
   getAllUserService,
   getUserByIdService,
   loginService,
   registerUserService,
+  totalCountSevice,
   updatePasswordService,
   updateUserByIdService,
 } from "../services/user.service";
@@ -12,17 +16,20 @@ import {
   sendErrorResponse,
   sendSuccessResponse,
 } from "../utils/responseHelper";
+import { Role } from "../enum/auth.enum";
+import { error } from "console";
 
 class AuthController {
   static async registerUser(req: Request, res: Response) {
     try {
-      const { name, email, password, phone, profileImage } = req.body;
+      const { name, email, password, phone, profileImage, role } = req.body;
       const result = await registerUserService(
         name,
         email,
         password,
         phone,
         profileImage,
+        role,
       );
 
       return sendSuccessResponse(
@@ -59,6 +66,34 @@ class AuthController {
       sendErrorResponse(res, "Error occured", 400);
     }
   }
+
+  static async getAllStudent(req: Request, res: Response) {
+    try {
+      const user = await getAllStudentService();
+      sendSuccessResponse(res, "Data fetched", user, 200);
+    } catch (err: any) {
+      sendErrorResponse(res, "Error occured", 400);
+    }
+  }
+
+  static async getAllTeacher(req: Request, res: Response) {
+    try {
+      const user = await getAllTeacherService();
+      sendSuccessResponse(res, "Data fetched", user, 200);
+    } catch (err: any) {
+      sendErrorResponse(res, "Error occured", 400);
+    }
+  }
+
+  static async getAllParents(req: Request, res: Response) {
+    try {
+      const user = await getAllParentService();
+      sendSuccessResponse(res, "Data fetched", user, 200);
+    } catch (err: any) {
+      sendErrorResponse(res, "Error occured", 400);
+    }
+  }
+
   static async getUserById(req: Request, res: Response) {
     try {
       let id: any;
@@ -106,9 +141,20 @@ class AuthController {
     try {
       let id: any;
       id = req.params.id;
-      await deleteUserService(id);
-      sendSuccessResponse(res, "Data Deleted", null, 200);
+      const data = await deleteUserService(id);
+      sendSuccessResponse(res, "Data Deleted", data, 200);
     } catch (err: any) {
+      sendErrorResponse(res, "Error occured", 400);
+    }
+  }
+
+  static async totalCount(req: Request, res: Response) {
+    try {
+      const data = await totalCountSevice();
+      sendSuccessResponse(res, "Total user", data, 200);
+    } catch (err: any) {
+      console.log(err.message);
+
       sendErrorResponse(res, "Error occured", 400);
     }
   }
