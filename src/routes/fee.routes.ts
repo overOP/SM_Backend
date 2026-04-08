@@ -1,13 +1,14 @@
 import express, { Router } from "express";
 import FeeController from "../controllers/fee.controller";
+import catchAsync from "../utils/catchAsync";
 
 const router: Router = express.Router();
 
-router.post("/add-fee", FeeController.addFee);
-router.get("/", FeeController.getAllFee);
+router.post("/add-fee", catchAsync(FeeController.addFee));
+router.get("/", catchAsync(FeeController.getAllFee));
 
-router.get("/:id", FeeController.getFeeById);
-router.patch("/update-fee/:id", FeeController.updateFeeById);
-router.delete("/delete-fee/:id", FeeController.deleteFee);
+router.get("/:id", catchAsync(FeeController.getFeeById));
+router.patch("/update-fee/:id", catchAsync(FeeController.updateFeeById));
+router.delete("/delete-fee/:id", catchAsync(FeeController.deleteFee));
 
 export default router;

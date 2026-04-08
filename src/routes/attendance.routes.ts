@@ -1,16 +1,20 @@
 import express, { Router } from "express";
 import AttendanceController from "../controllers/attendance.controller";
+import catchAsync from "../utils/catchAsync";
 
 const router: Router = express.Router();
 
-router.post("/add-attendance", AttendanceController.addAttendance);
-router.get("/", AttendanceController.getAllAttendance);
+router.post("/add-attendance", catchAsync(AttendanceController.addAttendance));
+router.get("/", catchAsync(AttendanceController.getAllAttendance));
 
-router.get("/:id", AttendanceController.getAttendanceById);
+router.get("/:id", catchAsync(AttendanceController.getAttendanceById));
 router.patch(
   "/update-attendance/:id",
-  AttendanceController.updateAttendanceById,
+  catchAsync(AttendanceController.updateAttendanceById),
 );
-router.delete("/delete-attendance/:id", AttendanceController.deleteAttendance);
+router.delete(
+  "/delete-attendance/:id",
+  catchAsync(AttendanceController.deleteAttendance),
+);
 
 export default router;
