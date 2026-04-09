@@ -7,6 +7,7 @@ import {
 import {
   addAttendanceServices,
   deleteAttendanceServices,
+  downloadAttendanceServices,
   getAllAttendanceServices,
   getAttendanceByIdServices,
   updateAttendanceByIdServices,
@@ -40,6 +41,7 @@ class AttendanceController {
         200,
       );
     } catch (err: any) {
+      console.log(err.message);
       return sendErrorResponse(res, "Error fetching attendance", 400);
     }
   }
@@ -92,6 +94,25 @@ class AttendanceController {
         return sendErrorResponse(res, "Attendance not found", 400);
       }
       return sendErrorResponse(res, "Error deleting attendance", 400);
+    }
+  }
+
+  static async downloadAttendance(req: Request, res: Response) {
+    try {
+      let id = req.params.id;
+      const attendances = await downloadAttendanceServices(id as any);
+      res.setHeader("Content-Type", "application/json");
+      res.setHeader(
+        "Content-Disposition",
+        "attachment;filename=attendance.pdf",
+      );
+      return res.send(attendances);
+    } catch (err: any) {
+      console.log(err.message);
+      if (err.message === "ATTENDANCE_NOT_FOUND") {
+        return sendErrorResponse(res, "Attendance not found", 400);
+      }
+      return sendErrorResponse(res, "Error downloading attendance", 400);
     }
   }
 }

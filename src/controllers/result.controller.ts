@@ -7,6 +7,7 @@ import {
 import {
   addResultServices,
   deleteResultServices,
+  downloadsResultServices,
   getAllResultServices,
   getResultByIdServices,
   updateResultByIdServices,
@@ -15,14 +16,14 @@ import {
 class ResultController {
   static async addResult(req: Request, res: Response) {
     try {
-      const { subject, marks, grade, status, userId } = req.body;
+      const { subject, marks, grade, status, studentId } = req.body;
 
       const results = await addResultServices(
         subject,
         marks,
         grade,
         status,
-        userId,
+        studentId,
       );
       return sendSuccessResponse(
         res,
@@ -46,6 +47,7 @@ class ResultController {
         200,
       );
     } catch (err: any) {
+      console.log(err.message);
       return sendErrorResponse(res, "Error fetching result", 400);
     }
   }
@@ -100,6 +102,22 @@ class ResultController {
         return sendErrorResponse(res, "Result not found", 400);
       }
       return sendErrorResponse(res, "Error deleting result", 400);
+    }
+  }
+
+  static async downloadsResult(req: Request, res: Response) {
+    try {
+      let id = req.params.id;
+      const results = await downloadsResultServices(id as any);
+      res.setHeader("Content-Type", "apllication/json");
+      res.setHeader("Content-Disposition", "attachment;filename=result.pdf");
+      return res.send(results);
+    } catch (err: any) {
+      console.log(err.message);
+      if (err.message === "RESULT_NOT_FOUND") {
+        return sendErrorResponse(res, "Result not found", 400);
+      }
+      return sendErrorResponse(res, "Error downloading result", 400);
     }
   }
 }

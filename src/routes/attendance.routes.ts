@@ -16,5 +16,9 @@ router.delete(
   "/delete-attendance/:id",
   catchAsync(AttendanceController.deleteAttendance),
 );
+router.get(
+  "/download-attendance/:id",
+  catchAsync(AttendanceController.downloadAttendance),
+);
 
 export default router;

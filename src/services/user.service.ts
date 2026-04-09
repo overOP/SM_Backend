@@ -48,7 +48,6 @@ export const registerStudentService = async (
   paidAmount: number,
   role: "student",
 ) => {
-  console.log("Checking email");
   const emailExist = await User.findOne({
     where: { email: email },
   });
@@ -56,13 +55,11 @@ export const registerStudentService = async (
   if (emailExist) {
     throw new Error("EMAIL_EXIST!");
   }
-  console.log("Hashing password");
 
   const hashPassword = await bcrypt.hash(
     password,
     Number(process.env.BCRYPT_SALT_ROUNDS),
   );
-  console.log("Creating student");
 
   const student = await User.create({
     profileImage,
@@ -89,7 +86,6 @@ export const registerStudentService = async (
     paidAmount: paidAtRegistration,
     dueAmount,
   });
-  console.log("Done");
   return student;
 };
 

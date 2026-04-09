@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import {
   deleteFeeServices,
+  downloadFeeService,
   getAllFeeServices,
   getFeeByIdServices,
   updateFeeByIdServices,
@@ -53,6 +54,22 @@ class FeeController {
         return sendErrorResponse(res, "Fee not found", 400);
       }
       return sendErrorResponse(res, "Error deleting fee", 400);
+    }
+  }
+
+  static async downloadFee(req: Request, res: Response) {
+    try {
+      let id = req.params.id;
+      const pdfBuffer = await downloadFeeService(id as any);
+      res.setHeader("Content-Type", "application/json");
+      res.setHeader("Content-Disposition", `attachment;filename=feeReport.pdf`);
+      return res.send(pdfBuffer);
+    } catch (err: any) {
+      console.log(err.message);
+      if (err.message === "FEE_NOT_FOUND") {
+        return sendErrorResponse(res, "Fee not found", 400);
+      }
+      return sendErrorResponse(res, "Error Occured", 400);
     }
   }
 }

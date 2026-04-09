@@ -14,6 +14,9 @@ import User from "./user.models";
   timestamps: true,
 })
 class Fee extends Model {
+  map(p0: (fee: any) => void) {
+    throw new Error("Method not implemented.");
+  }
   @Column({
     primaryKey: true,
     type: DataType.UUID,
@@ -53,7 +56,7 @@ class Fee extends Model {
   declare studentId: string;
 
   @BelongsTo(() => User)
-  declare user: string;
+  declare user: User;
 }
 
 export default Fee;

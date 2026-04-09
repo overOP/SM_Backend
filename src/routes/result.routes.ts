@@ -13,5 +13,9 @@ router.patch(
   catchAsync(ResultController.updateResultById),
 );
 router.delete("/delete-result/:id", catchAsync(ResultController.deleteResult));
+router.get(
+  "/download-result/:id",
+  catchAsync(ResultController.downloadsResult),
+);
 
 export default router;
