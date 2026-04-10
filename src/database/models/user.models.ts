@@ -1,4 +1,15 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import {
+  AllowNull,
+  Column,
+  DataType,
+  Default,
+  ForeignKey,
+  HasOne,
+  Model,
+  Table,
+} from "sequelize-typescript";
+import Attendance from "./attendance.models";
+import Result from "./result.models";
 
 @Table({
   tableName: "users",
@@ -99,6 +110,51 @@ class User extends Model {
     defaultValue: "student",
   })
   declare role: "student" | "teacher" | "principal" | "parent" | "superadmin";
+
+  @Column({
+    type: DataType.STRING(125),
+    allowNull: true,
+  })
+  declare passwordOtp?: string | null;
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  declare passwordOtpExpiresAt?: Date | null;
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  declare otpLastSentAt?: Date | null;
+
+  @Default(0)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: true,
+  })
+  declare otpResendCount: number;
+
+  @Default(0)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: true,
+  })
+  declare otpAttempts: number;
+
+  @Default(false)
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: true,
+  })
+  declare isOtPVerified: boolean;
+
+  @HasOne(() => Attendance, { foreignKey: "" })
+  declare attendance: Attendance[];
+
+  @HasOne(() => Result, { foreignKey: "" })
+  declare result: Result[];
 }
 
 export default User;

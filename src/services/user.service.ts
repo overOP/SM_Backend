@@ -1,9 +1,13 @@
 import User from "../database/models/user.models";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { Op } from "sequelize";
+import { Op, STRING } from "sequelize";
 import { Role } from "../enum/auth.enum";
 import Fee from "../database/models/fee.models";
+import { generateOtp, hashOtp } from "../utils/otpUtils";
+import { sendEmail } from "../utils/sendEmail";
+
+const RESET_TOKEN_EXPIRES_MIN = Number(process.env.OTP_RESET_TOKEN_EXPIRES_MIN);
 
 export const registerUserService = async (
   name: string,
@@ -78,7 +82,6 @@ export const registerStudentService = async (
 
   const paidAtRegistration = paidAmount || 0;
   const dueAmount = totalAmount - paidAtRegistration;
-  console.log("Creating fee");
 
   await Fee.create({
     studentId: student.id,
@@ -87,6 +90,76 @@ export const registerStudentService = async (
     dueAmount,
   });
   return student;
+};
+
+export const forgotPasswordService = async (email: string) => {
+  const user = await User.findOne({ where: { email: email } });
+
+  if (!user) {
+    throw new Error("USER_NOT_FOUND");
+  }
+
+  const now = Date.now();
+
+  const otp = generateOtp(Number(process.env.OTP_LENGTH));
+
+  user.passwordOtp = hashOtp(otp);
+  await user.save();
+
+  await sendEmail({
+    email: user.email,
+    subject: "Password Reset OTP",
+    message: `Your Otp is ${otp}`,
+  });
+};
+
+export const verifyOtpService = async (email: string, otp: string) => {
+  const user = await User.findOne({ where: { email: email } });
+
+  if (!user) {
+    throw new Error("USER_NOT_FOUND");
+  }
+
+  const hashhProvidedOtp = hashOtp(String(otp));
+  user.isOtPVerified = true;
+  user.passwordOtp = null;
+
+  await user.save();
+
+  const resetToken = jwt.sign(
+    { id: user.id },
+    process.env.JWT_SECRET as string,
+    {
+      expiresIn: "10m",
+    },
+  );
+  return resetToken;
+};
+
+export const resetPasswordService = async (
+  resetToken: string,
+  newPassword: string,
+) => {
+  let payload: any;
+  console.log(newPassword);
+  payload = jwt.verify(resetToken, String(process.env.JWT_SECRET));
+  if (!payload) {
+    throw new Error("TOKEN_NOT_FOUND");
+  }
+  const user = await User.findByPk(payload.id);
+
+  if (!user) {
+    throw new Error("USER_NOT_FOUND");
+  }
+
+  const hashPassword = await bcrypt.hash(
+    newPassword,
+    Number(process.env.BCRYPT_SALT_ROUNDS),
+  );
+  user.password = hashPassword;
+
+  await user.save();
+  return user;
 };
 
 export const loginService = async (email: string, password: string) => {
@@ -136,13 +209,11 @@ export const updatePasswordService = async (
   newPassword: string,
 ) => {
   const user = await User.findByPk(id);
-  console.log(user);
 
   if (!user) {
     throw new Error("USER_NOT_FOUND");
   }
   const checkPassword = await bcrypt.compare(password, user.password);
-  console.log(checkPassword);
   if (!checkPassword) {
     throw new Error("OLD_PASSWORD_DIDNOT_MATCH");
   }
@@ -150,7 +221,6 @@ export const updatePasswordService = async (
     newPassword,
     Number(process.env.BCRYPT_SALT_ROUNDS),
   );
-  console.log(hashPassword);
 
   user.password = hashPassword;
   await user.save();
@@ -171,6 +241,17 @@ export const getAllUserService = async () => {
       role: {
         [Op.ne]: Role.Superadmin,
       },
+    },
+    attributes: {
+      exclude: [
+        "password",
+        "otp",
+        "otpExpiry",
+        "otpAttempts",
+        "otpRequestTime",
+        "createdAt",
+        "updatedAt",
+      ],
     },
   });
   return user;
@@ -195,6 +276,7 @@ export const getAllStudentService = async () => {
       "section",
       "role",
     ],
+
     where: {
       role: {
         [Op.eq]: Role.Student,
