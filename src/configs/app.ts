@@ -5,6 +5,8 @@ import event from "../routes/event.routes";
 import fee from "../routes/fee.routes";
 import attendance from "../routes/attendance.routes";
 import result from "../routes/result.routes";
+import announcement from "../routes/announcement.routes";
+
 export class App {
   public app = express();
 
@@ -29,5 +31,6 @@ export class App {
     this.app.use("/api/results", result);
     this.app.use("/api/fees", fee);
     this.app.use("/api/attendances", attendance);
+    this.app.use("/api/announcement", announcement);
   }
 }
