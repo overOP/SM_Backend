@@ -7,6 +7,7 @@ import {
   Table,
 } from "sequelize-typescript";
 import User from "./user.models";
+import Subject from "./subject.models";
 
 @Table({
   tableName: "attendances",
@@ -26,6 +27,12 @@ class Attendance extends Model {
     defaultValue: "present",
   })
   declare status: "present" | "absent";
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+    defaultValue: DataType.NOW,
+  })
+  declare date: Date;
 
   @ForeignKey(() => User)
   @Column({
@@ -36,6 +43,16 @@ class Attendance extends Model {
 
   @BelongsTo(() => User)
   declare user: User;
+
+  @ForeignKey(() => Subject)
+  @Column({
+    type: DataType.UUID,
+    allowNull: false,
+  })
+  declare subjectId: string;
+
+  @BelongsTo(() => Subject)
+  declare subject: Subject;
 }
 
 export default Attendance;

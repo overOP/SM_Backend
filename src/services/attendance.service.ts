@@ -1,14 +1,15 @@
 import puppeteer from "puppeteer";
 import Attendance from "../database/models/attendance.models";
 import User from "../database/models/user.models";
-import { AttendanceStatus } from "../enum/auth.enum";
 
 export const addAttendanceServices = async (
   studentId: string,
+  subjectId: string,
   AttendanceStatus: any,
 ) => {
   const attendances = await Attendance.create({
     studentId,
+    subjectId,
     AttendanceStatus,
   });
   return attendances;

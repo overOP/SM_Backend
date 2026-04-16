@@ -16,9 +16,10 @@ import {
 class AttendanceController {
   static async addAttendance(req: Request, res: Response) {
     try {
-      const { studentId, AttendanceStatus } = req.body;
+      const { studentId, AttendanceStatus, subjectId } = req.body;
       const attendances = await addAttendanceServices(
         studentId,
+        subjectId,
         AttendanceStatus,
       );
       return sendSuccessResponse(
@@ -28,6 +29,7 @@ class AttendanceController {
         200,
       );
     } catch (err: any) {
+      console.log(err.message);
       return sendErrorResponse(res, "Error adding attendance", 400);
     }
   }

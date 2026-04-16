@@ -1,17 +1,16 @@
 import puppeteer from "puppeteer";
 import Result from "../database/models/result.models";
 import User from "../database/models/user.models";
-import { ResultStatus } from "../enum/auth.enum";
 
 export const addResultServices = async (
-  subject: string,
+  subjectId: string,
   marks: string,
   grade: string,
   ResultStatus: "pass" | "NG",
   studentId: string,
 ) => {
   const results = await Result.create({
-    subject,
+    subjectId,
     marks,
     grade,
     ResultStatus,

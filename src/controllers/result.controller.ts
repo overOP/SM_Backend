@@ -16,10 +16,10 @@ import {
 class ResultController {
   static async addResult(req: Request, res: Response) {
     try {
-      const { subject, marks, grade, status, studentId } = req.body;
+      const { subjectId, marks, grade, status, studentId } = req.body;
 
       const results = await addResultServices(
-        subject,
+        subjectId,
         marks,
         grade,
         status,

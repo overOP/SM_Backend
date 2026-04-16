@@ -1,4 +1,5 @@
 import {
+  AllowNull,
   BelongsTo,
   Column,
   DataType,
@@ -7,6 +8,7 @@ import {
   Table,
 } from "sequelize-typescript";
 import User from "./user.models";
+import Subject from "./subject.models";
 
 @Table({
   tableName: "results",
@@ -26,12 +28,6 @@ class Result extends Model {
   //   allowNull: true,
   // })
   // declare class: string | null;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  declare subject: string;
 
   @Column({
     type: DataType.STRING,
@@ -60,6 +56,16 @@ class Result extends Model {
 
   @BelongsTo(() => User)
   declare user: User;
+
+  @ForeignKey(() => Subject)
+  @Column({
+    type: DataType.UUID,
+    allowNull: false,
+  })
+  declare subjectId: string;
+
+  @BelongsTo(() => Subject)
+  declare subject: Subject;
 }
 
 export default Result;
