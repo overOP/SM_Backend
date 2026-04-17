@@ -1,6 +1,7 @@
 import puppeteer from "puppeteer";
 import Attendance from "../database/models/attendance.models";
 import User from "../database/models/user.models";
+import Subject from "../database/models/subject.models";
 
 export const addAttendanceServices = async (
   studentId: string,
@@ -17,10 +18,23 @@ export const addAttendanceServices = async (
 
 export const getAllAttendanceServices = async () => {
   const attendances = await Attendance.findAll({
-    include: {
-      model: User,
-      attributes: ["name", "email", "rollNumber", "section", "classGrade"],
-    },
+    include: [
+      {
+        model: User,
+        attributes: [
+          "id",
+          "name",
+          "email",
+          "rollNumber",
+          "section",
+          "classGrade",
+        ],
+      },
+      {
+        model: Subject,
+        attributes: ["id", "subjectName"],
+      },
+    ],
   });
   return attendances;
 };

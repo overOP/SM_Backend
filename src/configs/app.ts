@@ -34,5 +34,5 @@ export class App {
     this.app.use("/api/attendances", attendance);
     this.app.use("/api/announcements", announcement);
     this.app.use("/api/subjects", subject);
-  }
+}
 }

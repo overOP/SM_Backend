@@ -1,6 +1,7 @@
 import puppeteer from "puppeteer";
 import Result from "../database/models/result.models";
 import User from "../database/models/user.models";
+import Subject from "../database/models/subject.models";
 
 export const addResultServices = async (
   subjectId: string,
@@ -27,6 +28,16 @@ export const getAllResultServices = async () => {
         model: User,
         attributes: ["id", "name", "email", "rollNumber", "classGrade"],
       },
+      {
+        model: Subject,
+        attributes: [
+          "id",
+          "subjectName",
+          "subjectCode",
+          "fullMarks",
+          "passMarks",
+        ],
+      },
     ],
   });
   return results;
@@ -37,6 +48,16 @@ export const getResultByIdServices = async (id: string) => {
       {
         model: User,
         attributes: ["id", "name", "email", "rollNumber", "classGrade"],
+      },
+      {
+        model: Subject,
+        attributes: [
+          "id",
+          "subjectName",
+          "subjectCode",
+          "fullMarks",
+          "passMarks",
+        ],
       },
     ],
   });
@@ -49,6 +70,16 @@ export const updateResultByIdServices = async (id: string, data: any) => {
       {
         model: User,
         attributes: ["id", "name", "rollNumber", "classgrade"],
+      },
+      {
+        model: Subject,
+        attributes: [
+          "id",
+          "subjectName",
+          "subjectCode",
+          "fullMarks",
+          "passMarks",
+        ],
       },
     ],
   });
@@ -78,6 +109,16 @@ export const downloadsResultServices = async (id: string) => {
         model: User,
         attributes: ["id", "name", "email", "rollNumber", "classGrade"],
       },
+      {
+        model: Subject,
+        attributes: [
+          "id",
+          "subjectName",
+          "subjectCode",
+          "fullMarks",
+          "passMarks",
+        ],
+      },
     ],
   });
   if (!results) {
@@ -105,9 +146,12 @@ export const downloadsResultServices = async (id: string) => {
               <th>Roll Number</th>
               <th>Class Grade</th>
               <th>Subject</th>
+              <th>Subject Code</th>
+              <th>Full Marks</th>
+              <th>Pass Marks</th>
               <th>Marks</th>
               <th>Grade</th>
-              <th>Status</th>
+              <th>Remarks</th>
             </tr>
           </thead>
          <tbody>
@@ -117,7 +161,10 @@ export const downloadsResultServices = async (id: string) => {
               <td>${results.user?.email ?? ""}</td>
               <td>${results.user?.rollNumber ?? ""}</td>
               <td>${results.user?.classGrade ?? ""}</td>
-              <td>${results.subject}</td>
+              <td>${results.subject?.subjectName}</td>
+              <td>${results.subject?.subjectCode}</td>
+              <td>${results.subject?.fullMarks}</td>
+              <td>${results.subject?.passMarks}</td>
               <td>${results.marks}</td>
               <td>${results.grade}</td>
               <td>${results.status}</td>

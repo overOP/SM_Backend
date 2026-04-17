@@ -6,6 +6,7 @@ import {
   getAllStudentService,
   getAllTeacherService,
   getAllUserService,
+  getAttendanceServices,
   getUserByIdService,
   loginService,
   registerStudentService,
@@ -244,6 +245,18 @@ class AuthController {
       const data = await totalCountSevice();
       return sendSuccessResponse(res, "Total user", data, 200);
     } catch (err: any) {
+      return sendErrorResponse(res, err.message, 400);
+    }
+  }
+
+  static async getAttendance(req: Request, res: Response) {
+    try {
+      let studentId: any;
+      studentId = req.params.id;
+      const students = await getAttendanceServices(studentId);
+      return sendSuccessResponse(res, "Data fetched", students, 200);
+    } catch (err: any) {
+      console.log(err.message);
       return sendErrorResponse(res, err.message, 400);
     }
   }

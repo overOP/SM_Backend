@@ -6,6 +6,8 @@ import { Role } from "../enum/auth.enum";
 import Fee from "../database/models/fee.models";
 import { generateOtp, hashOtp } from "../utils/otpUtils";
 import { sendEmail } from "../utils/sendEmail";
+import Attendance from "../database/models/attendance.models";
+import Subject from "../database/models/subject.models";
 
 const RESET_TOKEN_EXPIRES_MIN = Number(process.env.OTP_RESET_TOKEN_EXPIRES_MIN);
 
@@ -338,4 +340,33 @@ export const totalCountSevice = async () => {
     },
   });
   return { totalUser, totalStudent, totalTeacher, totalParent };
+};
+
+export const getAttendanceServices = async (studentId: string) => {
+  const attendances = await User.findOne({
+    where: { id: studentId },
+    attributes: [
+      "profileImage",
+      "name",
+      "email",
+      "guardianName",
+      "classGrade",
+      "rollNumber",
+      "section",
+      "role",
+    ],
+    include: [
+      {
+        model: Attendance,
+        attributes: ["id", "status", "date"],
+        include: [
+          {
+            model: Subject,
+            attributes: ["id", "subjectName"],
+          },
+        ],
+      },
+    ],
+  });
+  return attendances;
 };

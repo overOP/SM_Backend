@@ -1,4 +1,12 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  HasMany,
+  Model,
+  Table,
+} from "sequelize-typescript";
+import Attendance from "./attendance.models";
 
 @Table({
   tableName: "subject",
@@ -36,6 +44,11 @@ class Subject extends Model {
     allowNull: true,
   })
   declare passMarks: string;
+
+  @HasMany(() => Attendance, { foreignKey: "subjectId" })
+  declare attendance: Attendance[];
+  @HasMany(() => Subject, { foreignKey: "subjectId" })
+  declare subject: Subject[];
 }
 
 export default Subject;

@@ -10,6 +10,8 @@ router.post("/login", catchAsync(AuthController.loginUser));
 router.post("/forgot-password", catchAsync(AuthController.forgotPassword));
 router.post("/verify-otp", catchAsync(AuthController.verifyOtp));
 router.get("/", catchAsync(AuthController.getAllUser));
+// router.get("/result", catchAsync(AuthController.getAllUser));
+router.get("/attendance/:id", catchAsync(AuthController.getAttendance));
 router.get("/students", catchAsync(AuthController.getAllStudent));
 router.get("/teachers", catchAsync(AuthController.getAllTeacher));
 router.get("/parents", catchAsync(AuthController.getAllParents));

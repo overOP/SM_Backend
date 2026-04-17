@@ -28,7 +28,7 @@ class Attendance extends Model {
   })
   declare status: "present" | "absent";
   @Column({
-    type: DataType.DATE,
+    type: DataType.DATEONLY,
     allowNull: true,
     defaultValue: DataType.NOW,
   })

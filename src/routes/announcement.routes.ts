@@ -8,7 +8,7 @@ const router: Router = express.Router();
 
 router.post(
   "/add-event",
-  auth.restrictTo(Role.Principal),
+  // auth.restrictTo(Role.Principal),
   catchAsync(EventController.addEvent),
 );
 router.get("/", catchAsync(EventController.getAllEvent));

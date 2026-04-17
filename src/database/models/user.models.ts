@@ -1,15 +1,14 @@
 import {
-  AllowNull,
   Column,
   DataType,
   Default,
-  ForeignKey,
-  HasOne,
+  HasMany,
   Model,
   Table,
 } from "sequelize-typescript";
 import Attendance from "./attendance.models";
 import Result from "./result.models";
+import Subject from "./subject.models";
 
 @Table({
   tableName: "users",
@@ -150,10 +149,10 @@ class User extends Model {
   })
   declare isOtPVerified: boolean;
 
-  @HasOne(() => Attendance, { foreignKey: "" })
+  @HasMany(() => Attendance, { foreignKey: "studentId" })
   declare attendance: Attendance[];
 
-  @HasOne(() => Result, { foreignKey: "" })
+  @HasMany(() => Result, { foreignKey: "studentId" })
   declare result: Result[];
 }
 
