@@ -43,4 +43,3 @@ export const checkRequiredFields = (
   }
   return true;
 };
- 
