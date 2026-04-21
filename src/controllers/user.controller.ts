@@ -336,6 +336,7 @@ class AuthController {
       return sendErrorResponse(res, err.message, 400);
     }
   }
+  
   static async getResult(req: Request, res: Response) {
     try {
       let studentId: any;
