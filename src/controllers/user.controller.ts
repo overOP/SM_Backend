@@ -232,7 +232,7 @@ class AuthController {
       }
 
       if (err.message.startsWith("OTP_INVALID")) {
-        const attemptsLeft = err.message;
+        const attemptsLeft = err.message.split(":")[1];
         console.log(attemptsLeft);
         return sendErrorResponse(
           res,
