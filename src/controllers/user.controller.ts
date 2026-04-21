@@ -198,15 +198,22 @@ class AuthController {
   }
 
   static async verifyOtp(req: Request, res: Response) {
-    if (!checkRequiredFields(req.body, ["email"], res)) return;
-    try {
-      const user = await verifyOtpService(req.body.email, req.body.otp);
+    if (!checkRequiredFields(req.body, ["email", "otp"], res)) return;
 
-      return sendSuccessResponse(res, "Check the email For the otp", user, 200);
+    try {
+      const resetToken = await verifyOtpService(req.body.email, req.body.otp);
+
+      return sendSuccessResponse(
+        res,
+        "OTP verified successfully",
+        { resetToken },
+        200,
+      );
     } catch (err: any) {
       if (err.message === "USER_NOT_FOUND") {
-        return sendErrorResponse(res, "User not found", 400);
+        return sendErrorResponse(res, "User not found", 404);
       }
+
       if (err.message === "NO_OTP_REQUESTED") {
         return sendErrorResponse(
           res,
@@ -233,14 +240,14 @@ class AuthController {
 
       if (err.message.startsWith("OTP_INVALID")) {
         const attemptsLeft = err.message.split(":")[1];
-        console.log(attemptsLeft);
         return sendErrorResponse(
           res,
           `Invalid OTP. Attempts left: ${attemptsLeft}`,
           401,
         );
       }
-      return sendErrorResponse(res, err.message, 400);
+
+      return sendErrorResponse(res, "OTP verification failed", 500);
     }
   }
 
@@ -336,7 +343,7 @@ class AuthController {
       return sendErrorResponse(res, err.message, 400);
     }
   }
-  
+
   static async getResult(req: Request, res: Response) {
     try {
       let studentId: any;

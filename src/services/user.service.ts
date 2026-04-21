@@ -169,8 +169,7 @@ export const forgotPasswordService = async (email: string) => {
 };
 
 export const verifyOtpService = async (email: string, otp: string) => {
-  const user = await User.findOne({ where: { email: email } });
-
+  const user = await User.findOne({ where: { email } });
   if (!user) {
     throw new Error("USER_NOT_FOUND");
   }
@@ -197,24 +196,30 @@ export const verifyOtpService = async (email: string, otp: string) => {
     throw new Error("OTP_EXPIRED");
   }
 
-  const hashhProvidedOtp = hashOtp(String(otp));
+  const hashedProvided = hashOtp(String(otp));
+  if (hashedProvided !== user.passwordOtp) {
+    user.otpAttempts = (user.otpAttempts || 0) + 1;
+    await user.save();
+
+    const attemptsLeft = OTP_MAX_ATTEMPTS - (user.otpAttempts || 1);
+
+    throw new Error(`OTP_INVALID:${attemptsLeft}`);
+  }
+
   user.isOtPVerified = true;
   user.passwordOtp = null;
   user.passwordOtpExpiresAt = null;
   user.otpAttempts = 0;
-
   await user.save();
 
   const resetToken = jwt.sign(
-    { id: user.id },
+    { id: user.id, type: "otp_reset" },
     process.env.JWT_SECRET as string,
-    {
-      expiresIn: "10m",
-    },
+    { expiresIn: `${RESET_TOKEN_EXPIRES_MIN}m` },
   );
+
   return resetToken;
 };
-
 export const resetPasswordService = async (
   resetToken: string,
   newPassword: string,
