@@ -8,19 +8,19 @@ const router: Router = express.Router();
 
 router.post(
   "/add-subject",
-  // auth.restrictTo(Role.Principal),
+  auth.restrictTo(Role.Principal, Role.Superadmin, Role.Teacher),
   catchAsync(SubjectController.addSubject),
 );
 router.get("/", catchAsync(SubjectController.getAllSubject));
 router.get("/:id", catchAsync(SubjectController.getSubjectById));
 router.patch(
   "/update-subject/:id",
-  auth.restrictTo(Role.Principal),
+  auth.restrictTo(Role.Principal, Role.Superadmin, Role.Teacher),
   catchAsync(SubjectController.updateSubjectById),
 );
 router.delete(
   "/delete-subject/:id",
-  auth.restrictTo(Role.Principal),
+  auth.restrictTo(Role.Principal, Role.Superadmin, Role.Teacher),
   catchAsync(SubjectController.deleteSubject),
 );
 

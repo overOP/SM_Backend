@@ -1,7 +1,6 @@
 import puppeteer from "puppeteer";
 import Fee from "../database/models/fee.models";
 import User from "../database/models/user.models";
-import { Model } from "sequelize";
 
 export const getAllFeeServices = async () => {
   const fees = await Fee.findAll({

@@ -8,19 +8,19 @@ const router: Router = express.Router();
 
 router.post(
   "/add-event",
-  // auth.restrictTo(Role.Principal),
+  auth.restrictTo(Role.Principal, Role.Superadmin, Role.Teacher),
   catchAsync(EventController.addEvent),
 );
 router.get("/", catchAsync(EventController.getAllEvent));
 router.get("/:id", catchAsync(EventController.getEventById));
 router.patch(
   "/update-event/:id",
-  auth.restrictTo(Role.Principal),
+  auth.restrictTo(Role.Principal, Role.Superadmin, Role.Teacher),
   catchAsync(EventController.updateEventById),
 );
 router.delete(
   "/delete-event/:id",
-  auth.restrictTo(Role.Principal),
+  auth.restrictTo(Role.Principal, Role.Superadmin, Role.Teacher),
   catchAsync(EventController.deleteEvent),
 );
 

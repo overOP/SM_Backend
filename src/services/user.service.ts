@@ -1,16 +1,28 @@
-import User from "../database/models/user.models";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { Op, STRING } from "sequelize";
-import { Role } from "../enum/auth.enum";
-import Fee from "../database/models/fee.models";
-import { generateOtp, hashOtp } from "../utils/otpUtils";
-import { sendEmail } from "../utils/sendEmail";
+import { Op } from "sequelize";
 import Attendance from "../database/models/attendance.models";
+import Fee from "../database/models/fee.models";
+import Result from "../database/models/result.models";
 import Subject from "../database/models/subject.models";
+import User from "../database/models/user.models";
+import { Role } from "../enum/auth.enum";
+import path from "path";
+import fs from "fs/promises";
+import { generateOtp, hashOtp, isOtpExpired } from "../utils/otpUtils";
+import { sendEmail } from "../utils/sendEmail";
 
 const RESET_TOKEN_EXPIRES_MIN = Number(process.env.OTP_RESET_TOKEN_EXPIRES_MIN);
+const OTP_EXPIRES_MIN = Number(process.env.OTP_EXPIRES_MIN);
+const OTP_RESEND_COOLDOWN_SEC = Number(process.env.OTP_RESEND_COOLDOWN_SEC);
+const OTP_MAX_RESENDS = Number(process.env.OTP_MAX_RESENDS);
+const OTP_MAX_ATTEMPTS = Number(process.env.OTP_MAX_ATTEMPTS);
 
+export const deleteFile = async (fileName?: string | null) => {
+  if (!fileName) return;
+  const filePath = path.join(process.cwd(), "uploads", fileName);
+  await fs.unlink(filePath).catch(() => {});
+};
 export const registerUserService = async (
   name: string,
   email: string,
@@ -38,7 +50,16 @@ export const registerUserService = async (
     profileImage,
     Role,
   });
-  return user;
+  return {
+    user: {
+      name,
+      email,
+      password,
+      phone,
+      profileImage,
+      Role,
+    },
+  };
 };
 export const registerStudentService = async (
   profileImage: string,
@@ -91,7 +112,22 @@ export const registerStudentService = async (
     paidAmount: paidAtRegistration,
     dueAmount,
   });
-  return student;
+  return {
+    user: {
+      profileImage,
+      name,
+      email,
+      password,
+      phoneNumber,
+      guardianName,
+      classGrade,
+      rollNumber,
+      section,
+      totalAmount,
+      paidAmount,
+      role,
+    },
+  };
 };
 
 export const forgotPasswordService = async (email: string) => {
@@ -102,10 +138,27 @@ export const forgotPasswordService = async (email: string) => {
   }
 
   const now = Date.now();
+  if (user.otpLastSentAt) {
+    const last = new Date(user.otpLastSentAt).getTime();
+    if (now - last < OTP_RESEND_COOLDOWN_SEC * 1000) {
+      throw new Error("OTP_COOLDOWN");
+    }
+  }
+
+  if ((user.otpResendCount || 0) >= OTP_MAX_RESENDS) {
+    throw new Error("OTP_LIMIT");
+  }
 
   const otp = generateOtp(Number(process.env.OTP_LENGTH));
-
   user.passwordOtp = hashOtp(otp);
+  user.passwordOtpExpiresAt = new Date(
+    Date.now() + OTP_EXPIRES_MIN * 60 * 1000,
+  );
+  user.otpLastSentAt = new Date();
+  user.otpResendCount = (user.otpResendCount || 0) + 1;
+  user.otpAttempts = 0;
+  user.isOtPVerified = false;
+
   await user.save();
 
   await sendEmail({
@@ -122,9 +175,33 @@ export const verifyOtpService = async (email: string, otp: string) => {
     throw new Error("USER_NOT_FOUND");
   }
 
+  if (!user.passwordOtp || !user.passwordOtpExpiresAt) {
+    throw new Error("NO_OTP_REQUESTED");
+  }
+
+  if ((user.otpAttempts || 0) >= OTP_MAX_ATTEMPTS) {
+    user.passwordOtp = null;
+    user.passwordOtpExpiresAt = null;
+    user.otpAttempts = 0;
+    await user.save();
+
+    throw new Error("OTP_ATTEMPTS_EXCEEDED");
+  }
+
+  if (isOtpExpired(user.passwordOtpExpiresAt)) {
+    user.passwordOtp = null;
+    user.passwordOtpExpiresAt = null;
+    user.otpAttempts = 0;
+    await user.save();
+
+    throw new Error("OTP_EXPIRED");
+  }
+
   const hashhProvidedOtp = hashOtp(String(otp));
   user.isOtPVerified = true;
   user.passwordOtp = null;
+  user.passwordOtpExpiresAt = null;
+  user.otpAttempts = 0;
 
   await user.save();
 
@@ -143,10 +220,12 @@ export const resetPasswordService = async (
   newPassword: string,
 ) => {
   let payload: any;
-  console.log(newPassword);
   payload = jwt.verify(resetToken, String(process.env.JWT_SECRET));
   if (!payload) {
     throw new Error("TOKEN_NOT_FOUND");
+  }
+  if (!payload || payload.type !== "otp_reset" || !payload.id) {
+    throw new Error("INVALID_TOKEN");
   }
   const user = await User.findByPk(payload.id);
 
@@ -161,7 +240,17 @@ export const resetPasswordService = async (
   user.password = hashPassword;
 
   await user.save();
-  return user;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: "Your password has been changed",
+      message:
+        "This is a confirmation that your account password was successfully changed. If this was not you, please contact support immediately.",
+    });
+  } catch (err: any) {
+    console.log("Password reset email failed", err.message);
+  }
 };
 
 export const loginService = async (email: string, password: string) => {
@@ -184,6 +273,7 @@ export const loginService = async (email: string, password: string) => {
   return {
     token,
     user: {
+      id: userExist.id,
       email: userExist.email,
       name: userExist.name,
       role: userExist.role,
@@ -199,6 +289,9 @@ export const updateUserByIdService = async (id: string, data: any) => {
     throw new Error("USER_NOT_FOUND");
   }
 
+  if (data.profileImage && user.profileImage) {
+    await deleteFile(user.profileImage);
+  }
   user.set(data);
   user.save();
 
@@ -369,4 +462,39 @@ export const getAttendanceServices = async (studentId: string) => {
     ],
   });
   return attendances;
+};
+
+export const getResultServices = async (studentId: string) => {
+  const results = await User.findOne({
+    where: { id: studentId },
+    attributes: [
+      "profileImage",
+      "name",
+      "email",
+      "guardianName",
+      "classGrade",
+      "rollNumber",
+      "section",
+      "role",
+    ],
+    include: [
+      {
+        model: Result,
+        attributes: ["id", "marks", "grade", ""],
+        include: [
+          {
+            model: Subject,
+            attributes: [
+              "id",
+              "subjectName",
+              "subjectCode",
+              "fullMarks",
+              "passMarks",
+            ],
+          },
+        ],
+      },
+    ],
+  });
+  return results;
 };

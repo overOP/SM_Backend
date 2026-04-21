@@ -47,6 +47,7 @@ class Subject extends Model {
 
   @HasMany(() => Attendance, { foreignKey: "subjectId" })
   declare attendance: Attendance[];
+
   @HasMany(() => Subject, { foreignKey: "subjectId" })
   declare subject: Subject[];
 }

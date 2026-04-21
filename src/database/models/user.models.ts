@@ -3,12 +3,14 @@ import {
   DataType,
   Default,
   HasMany,
+  HasOne,
   Model,
   Table,
 } from "sequelize-typescript";
 import Attendance from "./attendance.models";
 import Result from "./result.models";
 import Subject from "./subject.models";
+import Fee from "./fee.models";
 
 @Table({
   tableName: "users",
@@ -154,6 +156,9 @@ class User extends Model {
 
   @HasMany(() => Result, { foreignKey: "studentId" })
   declare result: Result[];
+
+  @HasOne(() => Fee, { foreignKey: "studentId" })
+  declare fee: Fee[];
 }
 
 export default User;
