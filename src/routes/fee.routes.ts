@@ -1,14 +1,27 @@
 import express, { Router } from "express";
-import FeeController from "../controllers/fee.controller";
+import EventController from "../controllers/event.controller";
 import catchAsync from "../utils/catchAsync";
+import auth from "../middleware/authenticate.guard";
+import { Role } from "../enum/auth.enum";
 
 const router: Router = express.Router();
 
-router.get("/", catchAsync(FeeController.getAllFee));
-
-router.get("/:id", catchAsync(FeeController.getFeeById));
-router.patch("/update-fee/:id", catchAsync(FeeController.updateFeeById));
-router.delete("/delete-fee/:id", catchAsync(FeeController.deleteFee));
-router.get("/download/:id", catchAsync(FeeController.downloadFee));
+router.post(
+  "/add-event",
+  auth.restrictTo(Role.Principal, Role.Superadmin, Role.Teacher),
+  catchAsync(EventController.addEvent),
+);
+router.get("/", catchAsync(EventController.getAllEvent));
+router.get("/:id", catchAsync(EventController.getEventById));
+router.patch(
+  "/update-event/:id",
+  auth.restrictTo(Role.Principal, Role.Superadmin, Role.Teacher),
+  catchAsync(EventController.updateEventById),
+);
+router.delete(
+  "/delete-event/:id",
+  auth.restrictTo(Role.Principal, Role.Superadmin, Role.Teacher),
+  catchAsync(EventController.deleteEvent),
+);
 
 export default router;

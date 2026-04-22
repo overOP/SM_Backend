@@ -84,6 +84,7 @@ class SubjectController {
       return sendErrorResponse(res, "Error updating subject", 400);
     }
   }
+
   static async deleteSubject(req: Request, res: Response) {
     try {
       let id = req.params.id;
