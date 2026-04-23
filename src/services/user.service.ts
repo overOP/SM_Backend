@@ -50,6 +50,7 @@ export const registerUserService = async (
     profileImage,
     Role,
   });
+
   return {
     user: {
       name,
@@ -61,6 +62,7 @@ export const registerUserService = async (
     },
   };
 };
+
 export const registerStudentService = async (
   profileImage: string,
   name: string,
@@ -112,6 +114,7 @@ export const registerStudentService = async (
     paidAmount: paidAtRegistration,
     dueAmount,
   });
+
   return {
     user: {
       profileImage,
