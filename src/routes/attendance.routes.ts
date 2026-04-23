@@ -8,6 +8,7 @@ const router: Router = express.Router();
 
 router.post(
   "/add-attendance",
+  auth.isAuthenticated,
   auth.restrictTo(Role.Principal, Role.Superadmin, Role.Teacher),
   catchAsync(AttendanceController.addAttendance),
 );
@@ -16,11 +17,13 @@ router.get("/", catchAsync(AttendanceController.getAllAttendance));
 router.get("/:id", catchAsync(AttendanceController.getAttendanceById));
 router.patch(
   "/update-attendance/:id",
+  auth.isAuthenticated,
   auth.restrictTo(Role.Principal, Role.Superadmin, Role.Teacher),
   catchAsync(AttendanceController.updateAttendanceById),
 );
 router.delete(
   "/delete-attendance/:id",
+  auth.isAuthenticated,
   auth.restrictTo(Role.Principal, Role.Superadmin, Role.Teacher),
   catchAsync(AttendanceController.deleteAttendance),
 );

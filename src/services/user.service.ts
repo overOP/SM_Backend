@@ -76,6 +76,7 @@ export const registerStudentService = async (
   totalAmount: number,
   paidAmount: number,
   role: "student",
+
 ) => {
   const emailExist = await User.findOne({
     where: { email: email },
@@ -91,6 +92,7 @@ export const registerStudentService = async (
   );
 
   const student = await User.create({
+    
     profileImage,
     name,
     email,
@@ -103,6 +105,7 @@ export const registerStudentService = async (
     totalAmount,
     paidAmount,
     role,
+
   });
 
   const paidAtRegistration = paidAmount || 0;
@@ -163,7 +166,6 @@ export const forgotPasswordService = async (email: string) => {
   user.isOtPVerified = false;
 
   await user.save();
-
   await sendEmail({
     email: user.email,
     subject: "Password Reset OTP",
